@@ -19,11 +19,6 @@ router.get('/products', (req, res) => {
         <title>Products</title>
         <script src="/script.js" defer></script>
         <style>
-          body {
-            font-family: Arial, sans-serif;
-            background: #f4f4f4;
-            padding: 20px;
-          }
           .product-grid {
             display: flex;
             flex-wrap: wrap;
@@ -38,6 +33,7 @@ router.get('/products', (req, res) => {
             width: 250px;
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
             text-align: center;
+            font-family: Arial, sans-serif;
           }
           .product-card img {
             width: 100%;
@@ -69,7 +65,7 @@ router.get('/products', (req, res) => {
     products.forEach(p => {
       html += `
         <div class="product-card">
-          <img src="${p.image || '/placeholder.png'}" alt="${p.name}">
+          <img src="${p.image || '/uploads/placeholder.png'}" alt="${p.name}">
           <h3>${p.name}</h3>
           <p>${p.description}</p>
           <div class="price">$ ${p.price.toFixed(2)}</div>

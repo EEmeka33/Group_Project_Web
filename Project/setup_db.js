@@ -17,7 +17,7 @@ db.serialize(() => {
     description TEXT,
     price REAL,
     image TEXT,
-    category TEXT,
+    category TEXT DEFAULT 'Uncategorized',
     stock INTEGER DEFAULT 0,
     volume INTEGER DEFAULT 0
   )`);

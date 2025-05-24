@@ -5,6 +5,10 @@ const sqlite3 = require('sqlite3').verbose();
 const path = require('path');
 const router = express.Router();
 
+//for image upload
+const multer = require('multer');
+const upload = multer({ dest: 'uploads/' });
+
 function getDB() {
   return new sqlite3.Database('./db/database.db');
 }
@@ -114,8 +118,16 @@ router.get('/admin/users', (req, res) => {
                          <script src="/script.js" defer></script>
                          <a href="/admin">← Back</a><ul>`;
       users.forEach(u => {
-        html += `<li>${u.username} (${u.role}) - ${u.address}</li>`;
+        html += `
+    <li>
+      ${u.username} (${u.role}) - ${u.address}
+      <form method="GET" action="/admin/edit-user" style="display:inline;">
+        <input type="hidden" name="id" value="${u.id}">
+        <button type="submit">✏️ Modify</button>
+      </form>
+    </li>`;
       });
+
       html += '</ul>';
       res.send(html);
     });
@@ -123,8 +135,57 @@ router.get('/admin/users', (req, res) => {
 });
 
 
+
+router.get('/admin/edit-user', isAdmin, (req, res) => {
+  const userId = req.query.id;
+  const db = getDB();
+  db.get('SELECT * FROM users WHERE id = ?', [userId], (err, user) => {
+    db.close();
+    if (err || !user) return res.send('User not found.');
+
+    res.send(`
+      <h1>Edit User</h1>
+      <script src="/script.js" defer></script>
+      <a href="/admin/users">← Back</a>
+      <form method="POST" action="/admin/update-user">
+        <input type="hidden" name="id" value="${user.id}">
+        <label>Username:<input type="text" name="username" value="${user.username}" required></label><br>
+        <label>Address:<input type="text" name="address" value="${user.address || ''}"></label><br>
+        <label>Role:
+          <select name="role">
+            <option value="user" ${user.role === 'user' ? 'selected' : ''}>User</option>
+            <option value="admin" ${user.role === 'admin' ? 'selected' : ''}>Admin</option>
+          </select>
+        </label><br>
+        <button type="submit">Update</button>
+      </form>
+    `);
+  });
+});
+
+
+
+router.post('/admin/update-user', isAdmin, (req, res) => {
+  const { id, username, address, role } = req.body;
+
+  const db = getDB();
+  db.run(
+    'UPDATE users SET username = ?, address = ?, role = ? WHERE id = ?',
+    [username, address, role, id],
+    (err) => {
+      db.close();
+      if (err) return res.send('Error updating user: ' + err.message);
+      res.redirect('/admin/users');
+    }
+  );
+});
+
+
+
+
 router.get('/admin/products', (req, res) => {
   if (!req.session.userId) return res.send('Unauthorized');
+
   const db = getDB();
   db.get('SELECT role FROM users WHERE id = ?', [req.session.userId], (err, user) => {
     if (err || !user || user.role !== 'admin') {
@@ -135,40 +196,124 @@ router.get('/admin/products', (req, res) => {
     db.all('SELECT * FROM products', [], (err, products) => {
       db.close();
       if (err) return res.send('Error loading products');
-      let html = `<h1>Manage Products</h1>
-                         <script src="/script.js" defer></script>
-                         <a href="/admin">← Back</a><ul>`;
-      products.forEach(p => {
-        html += `
-          <li>${p.name} - Stock:
-            <form method="POST" action="/admin/update-stock" style="display:inline-flex; align-items:center; gap:4px;">
-              <input type="hidden" name="id" value="${p.id}">
-              <input type="number" name="stock" value="${p.stock || 0}" min="0" style="width:30px;">
-              <button type="submit">↺</button>
-            </form>
-             - Volume:
-            <form method="POST" action="/admin/update-volume" style="display:inline;">
-              <input type="hidden" name="id" value="${p.id}">
-              <input type="number" name="volume" value="${p.volume || 0}" min="0" style="width:30px;">
-              <button type="submit">↺</button>
-            </form>
-             - Price:
-            <form method="POST" action="/admin/update-price" style="display:inline;">
-              <input type="hidden" name="id" value="${p.id}">
-              <input type="number" name="price" value="${p.price}" min="0" step="0.01" style="width:70px;">
-              <button type="submit">↺</button>
-            </form>
-            <form method="POST" action="/admin/delete-product" style="display:inline;">
-              <input type="hidden" name="id" value="${p.id}">
-              <button type="submit">❌</button>
-            </form>
-          </li>`;
+
+      // Sort by stock-to-volume ratio (ascending)
+      products.sort((a, b) => {
+        const ratioA = a.volume > 0 ? a.stock / a.volume : 0;
+        const ratioB = b.volume > 0 ? b.stock / b.volume : 0;
+        return ratioA - ratioB;
       });
-      html += '</ul>';
+
+      let html = `
+        <html lang="">
+        <head>
+          <title>Admin Product Management</title>
+          <script src="/script.js" defer></script>
+          <style>
+            .grid { display: flex; flex-wrap: wrap; gap: 20px; }
+            .card {
+              border: 1px solid #ccc;
+              padding: 10px;
+              width: 250px;
+              border-radius: 8px;
+              box-shadow: 2px 2px 5px rgba(0,0,0,0.1);
+              background: #fdfdfd;
+            }
+            .card form { margin-bottom: 6px; }
+            input, textarea {
+              width: 100%;
+              margin-bottom: 6px;
+              padding: 4px;
+              box-sizing: border-box;
+            }
+            .bar-container {
+              width: 100%;
+              background-color: #eee;
+              border-radius: 4px;
+              overflow: hidden;
+              margin-bottom: 8px;
+              height: 12px;
+            }
+            .bar-fill {
+              height: 100%;
+              transition: width 0.3s ease;
+            }
+            img {
+              display: block;
+              margin: 0 auto 8px;
+              border-radius: 4px;
+            }
+          </style>
+        </head>
+        <body>
+          <h1>Manage Products</h1>
+          <a href="/admin">← Back</a>
+          <div class="grid">
+      `;
+
+      products.forEach(p => {
+        const ratio = (p.volume > 0) ? p.stock / p.volume : 0;
+        const percent = Math.max(0, Math.min(100, Math.floor(ratio * 100)));
+        const red = Math.min(255, Math.floor(255 * (1 - ratio)));
+        const green = Math.min(255, Math.floor(255 * ratio));
+        const color = `rgb(${red}, ${green}, 50)`;
+
+        html += `
+          <div class="card">
+            <div class="bar-container">
+              <div class="bar-fill" style="width: ${percent}%; background-color: ${color};"></div>
+            </div>
+
+            <p><strong>Image:</strong><br>
+              ${p.image
+          ? `<img src="${p.image}" width="100">`
+          : `<img src="/uploads/placeholder.png" width="100">`}
+            </p>
+
+            <form method="POST" action="/admin/update-product" enctype="multipart/form-data">
+              <input type="hidden" name="id" value="${p.id}">
+              <label>Name:<input type="text" name="name" value="${p.name}" required></label>
+              <label>Description:<textarea name="description" rows="2">${p.description || ''}</textarea></label>
+              <label>Volume:<input type="number" name="volume" value="${p.volume || 0}" min="0"></label>
+              <label>Price:<input type="number" name="price" value="${p.price}" min="0" step="0.01"></label>
+              <label>Stock:<input type="number" name="stock" value="${p.stock || 0}" min="0"></label>
+              <label>Category:<input type="text" name="category" value="${p.category || ''}"></label>
+              <label>Image:<input type="file" name="image"></label>
+              <button type="submit">Save Changes</button>
+
+
+            </form>
+
+            <form method="POST" action="/admin/delete-product">
+              <input type="hidden" name="id" value="${p.id}">
+              <button type="submit" style="color:red;">❌ Delete</button>
+            </form>
+          </div>
+        `;
+      });
+
+      // Add new product card
+      html += `
+        <form method="POST" action="/admin/create-product" enctype="multipart/form-data" class="card">
+          <h3>Create New Product</h3>
+          <label>Name:<input type="text" name="name" required></label>
+          <label>Description:<textarea name="description" rows="2"></textarea></label>
+          <label>Volume:<input type="number" name="volume" value="0" min="0"></label>
+          <label>Price:<input type="number" name="price" value="0" min="0" step="0.01"></label>
+          <label>Stock:<input type="number" name="stock" value="0" min="0"></label>
+          <label>Category:<input type="text" name="category" value=" "></label>
+          <label>Image:<input type="file" name="image"></label>
+          <button type="submit" style="margin-top:8px;">➕ Create</button>
+        </form>
+      `;
+
+      html += '</div></body></html>';
       res.send(html);
     });
   });
 });
+
+
 
 
 router.get('/admin/orders', (req, res) => {
@@ -222,6 +367,75 @@ router.get('/admin/orders', (req, res) => {
   });
 });
 
+
+router.post('/admin/update-product', upload.single('image'), (req, res) => {
+  const { id, name, description, price, volume, stock } = req.body;
+  const imagePath = req.file ? '/uploads/' + req.file.filename : null;
+
+  const db = getDB();
+  const query = imagePath
+    ? 'UPDATE products SET name = ?, description = ?, price = ?, volume = ?, stock = ?, image = ? WHERE id = ?'
+    : 'UPDATE products SET name = ?, description = ?, price = ?, volume = ?, stock = ? WHERE id = ?';
+  const params = imagePath
+    ? [name, description, price, volume, stock, imagePath, id]
+    : [name, description, price, volume, stock, id];
+
+  db.run(query, params, err => {
+    db.close();
+    if (err) return res.send('Error updating product: ' + err.message);
+    res.redirect('/admin/products');
+  });
+});
+
+router.post('/admin/update-product', upload.single('image'), (req, res) => {
+  const { id, name, description, price, volume, stock, category } = req.body;
+  const imagePath = req.file ? '/uploads/' + req.file.filename : null;
+
+  const db = getDB();
+  const query = imagePath
+    ? 'UPDATE products SET name = ?, description = ?, price = ?, volume = ?, stock = ?, category = ?, image = ? WHERE id = ?'
+    : 'UPDATE products SET name = ?, description = ?, price = ?, volume = ?, stock = ?, category = ? WHERE id = ?';
+  const params = imagePath
+    ? [name, description, price, volume, stock, category, imagePath, id]
+    : [name, description, price, volume, stock, category, id];
+
+  db.run(query, params, err => {
+    db.close();
+    if (err) return res.send('Error updating product: ' + err.message);
+    res.redirect('/admin/products');
+  });
+});
+
+
+router.post('/admin/create-product', upload.single('image'), (req, res) => {
+  const { name, description, volume, price, stock } = req.body;
+  const imagePath = req.file ? '/uploads/' + req.file.filename : null;
+
+  const db = getDB();
+  db.run(
+    'INSERT INTO products (name, description, volume, price, stock, image) VALUES (?, ?, ?, ?, ?, ?)',
+    [name, description, volume, price, stock, imagePath],
+    (err) => {
+      db.close();
+      if (err) return res.send('Error creating product: ' + err.message);
+      res.redirect('/admin/products');
+    }
+  );
+});
+
+router.post('/admin/delete-product', (req, res) => {
+  const { id } = req.body;
+
+  const db = getDB();
+  db.run('DELETE FROM products WHERE id = ?', [id], (err) => {
+    db.close();
+    if (err) {
+      console.error('Error deleting product:', err.message);
+      return res.send('Failed to delete product.');
+    }
+    res.redirect('/admin/products');
+  });
+});
 
 
 

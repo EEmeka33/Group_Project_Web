@@ -1,4 +1,4 @@
-// npm install express sqlite3 body-parser express-session bcrypt
+//npm install express sqlite3 body-parser express-session bcrypt multer
 const express = require('express');
 const session = require('express-session');
 const sqlite3 = require('sqlite3').verbose();
@@ -27,6 +27,8 @@ app.use('/', cartRoutes);
 app.use('/', productRoutes);
 app.use('/', adminRoutes);
 app.use('/', accountRoutes);
+app.use('/uploads', express.static('uploads'));
+
 
 app.get('/home', (req, res) => {
   res.sendFile(path.join(__dirname, '/public/index.html'));
