@@ -21,12 +21,11 @@ router.get('/cart', (req, res) => {
 
       let html = `
         <header>
-          <h1>Your Cart & Orders</h1>
+          <h1>Your Cart </h1>
           <script src="/script.js" defer></script>
         </header>`;
 
       let pending = orders.find(o => Number(o.created_at) === 0);
-      let completeOrders = orders.filter(o => Number(o.created_at) !== 0);
 
       const renderOrderItems = (orderId, title, cb) => {
         db.all(`
@@ -41,6 +40,7 @@ router.get('/cart', (req, res) => {
           }
 
           html += `<h2>${title}</h2><ul>`;
+          let totalPrice = 0;
           items.forEach(item => {
             html += `
               <li>${item.name} - $${item.price} ×
@@ -54,11 +54,14 @@ router.get('/cart', (req, res) => {
                 <button type="submit">Remove</button>
               </form>
               </li>`;
+            totalPrice += item.price * item.quantity;
           });
           html += '</ul>';
-
+          totalPrice += 25;
           if (title === 'Your Cart') {
             html += `
+              <p>  Tax + Shipping : $25 </p>
+              <p style="font-weight: bold;">Total: $${totalPrice.toFixed(2)}</p>
               <form method="POST" action="/clear-cart">
                 <button type="submit">Clear Cart</button>
               </form>
@@ -76,6 +79,90 @@ router.get('/cart', (req, res) => {
       if (pending) {
         tasks.push(cb => renderOrderItems(pending.id, 'Your Cart', cb));
       }
+
+      // Sequentially execute async item rendering
+      let i = 0;
+      const next = () => {
+        if (i < tasks.length) {
+          tasks[i++](next);
+        } else {
+          db.close();
+          res.send(html);
+        }
+      };
+      next();
+    });
+  });
+});
+
+router.get('/orders', (req, res) => {
+  if (!req.session.userId) return res.redirect('/login');
+
+  const db = new sqlite3.Database('./db/database.db');
+
+  db.serialize(() => {
+    db.all('SELECT * FROM orders WHERE user_id = ?', [req.session.userId], (err, orders) => {
+      if (err || !orders || orders.length === 0) {
+        db.close();
+        return res.send('<h1>Your cart is empty.</h1><script src="/script.js" defer></script>');
+      }
+
+      let html = `
+        <header>
+          <h1>Orders</h1>
+          <script src="/script.js" defer></script>
+        </header>`;
+
+      let completeOrders = orders.filter(o => Number(o.created_at) !== 0);
+
+      const renderOrderItems = (orderId, title, cb) => {
+        db.all(`
+          SELECT products.id, products.name, products.price, order_items.quantity
+          FROM order_items
+          JOIN products ON order_items.product_id = products.id
+          WHERE order_items.order_id = ?
+        `, [orderId], (err, items) => {
+          if (err || !items || items.length === 0) {
+            html += `<h2>${title}</h2><p>No items.</p>`;
+            return cb();
+          }
+
+          html += `<h2>${title}</h2><ul>`;
+          let totalPrice = 0;
+          items.forEach(item => {
+            html += `
+              <li>${item.name} - $${item.price} ×
+              <form method="POST" action="/update-quantity" style="display:inline-flex; align-items:center; gap:4px;">
+                <input type="hidden" name="id" value="${item.id}">
+                <input type="number" name="quantity" value="${item.quantity}" min="1" style="width:30px;">
+                <button type="submit" style="display:none;" >↺</button>
+              </form>
+              <form method="POST" action="/remove-from-cart" style="display:none;">
+                <input type="hidden" name="id" value="${item.id}">
+                <button type="submit">Remove</button>
+              </form>
+              </li>`;
+            totalPrice += item.price * item.quantity;
+          });
+          html += '</ul>';
+          totalPrice += 25;
+          if (title === 'Your Cart') {
+            html += `
+              <p>  Tax + Shipping : $25 </p>
+              <p style="font-weight: bold;">Total: $${totalPrice.toFixed(2)}</p>
+              <form method="POST" action="/clear-cart">
+                <button type="submit">Clear Cart</button>
+              </form>
+              <form method="POST" action="/place-order">
+                <button type="submit">Place Order</button>
+              </form>`;
+          }
+
+          cb();
+        });
+      };
+
+      const tasks = [];
 
       completeOrders.forEach((order, i) => {
         tasks.push(cb => renderOrderItems(order.id, 'Placed Order ' + (i + 1), cb));

@@ -19,12 +19,14 @@ const authRoutes = require('./routes/auth');
 const cartRoutes = require('./routes/cart');
 const productRoutes = require('./routes/products');
 const adminRoutes = require('./routes/admin_panel');
+const accountRoutes = require('./routes/account');
 const path = require("path");
 
 app.use('/', authRoutes);
 app.use('/', cartRoutes);
 app.use('/', productRoutes);
 app.use('/', adminRoutes);
+app.use('/', accountRoutes);
 
 app.get('/home', (req, res) => {
   res.sendFile(path.join(__dirname, '/public/index.html'));

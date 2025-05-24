@@ -36,7 +36,9 @@ document.addEventListener('DOMContentLoaded', () => {
               👤 ${data.username} ⌄
             </button>
             <div id="userMenu" style="display: none; position: absolute; right: 0; background-color: white; color: black; min-width: 150px; box-shadow: 0 8px 16px rgba(0,0,0,0.2); z-index: 1;">
+              <a href="/your-account" style="display:block; padding: 10px; text-decoration: none; color: black;">Your account</a>
               <a href="/cart" style="display:block; padding: 10px; text-decoration: none; color: black;">🛒 Cart</a>
+              <a href="/orders" style="display:block; padding: 10px; text-decoration: none; color: black;">🛒 Orders</a>
               <a href="/logout" style="display:block; padding: 10px; text-decoration: none; color: black;">🚪 Logout</a>
             </div>
           </div>
