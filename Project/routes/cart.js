@@ -65,7 +65,7 @@ router.get('/cart', (req, res) => {
               <form method="POST" action="/clear-cart">
                 <button type="submit">Clear Cart</button>
               </form>
-              <form method="POST" action="/place-order">
+              <form method="POST" action="/checkout">
                 <button type="submit">Place Order</button>
               </form>`;
           }
@@ -318,6 +318,8 @@ router.post('/place-order', (req, res) => {
     );
   });
 });
+
+
 
 
 module.exports = router;

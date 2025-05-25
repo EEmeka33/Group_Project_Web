@@ -19,6 +19,7 @@ db.serialize(() => {
     image TEXT,
     category TEXT DEFAULT 'Uncategorized',
     stock INTEGER DEFAULT 0,
+    sold INTEGER DEFAULT 0,
     volume INTEGER DEFAULT 0
   )`);
 
@@ -26,6 +27,7 @@ db.serialize(() => {
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     user_id INTEGER,
     total REAL,
+    address TEXT,
     created_at TEXT DEFAULT CURRENT_TIMESTAMP
   )`);
 

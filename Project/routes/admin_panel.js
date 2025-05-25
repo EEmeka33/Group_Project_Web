@@ -104,28 +104,41 @@ router.post('/admin/delete-order-item', (req, res) => {
 
 router.get('/admin/users', (req, res) => {
   if (!req.session.userId) return res.send('Unauthorized');
+
+  const search = req.query.search || '';
   const db = getDB();
+
   db.get('SELECT role FROM users WHERE id = ?', [req.session.userId], (err, user) => {
     if (err || !user || user.role !== 'admin') {
       db.close();
       return res.send('Access denied');
     }
 
-    db.all('SELECT * FROM users', [], (err, users) => {
+    const sql = search
+      ? 'SELECT * FROM users WHERE LOWER(username) LIKE LOWER(?)'
+      : 'SELECT * FROM users';
+
+    const params = search ? [`%${search}%`] : [];
+
+    db.all(sql, params, (err, users) => {
       db.close();
       if (err) return res.send('Error loading users');
-      let html = `<h1>Manage Users</h1>
-                         <script src="/script.js" defer></script>
-                         <a href="/admin">← Back</a><ul>`;
+
+      let html = `
+        <h1>Manage Users</h1>
+        <script src="/script.js" defer></script>
+        <a href="/admin">← Back</a>
+
+        <form method="GET" action="/admin/users" style="margin-bottom: 1em;">
+          <input type="text" name="search" placeholder="Search users..." value="${search}">
+          <button type="submit">Search</button>
+        </form>
+
+        <ul>
+      `;
+
       users.forEach(u => {
-        html += `
-    <li>
-      ${u.username} (${u.role}) - ${u.address}
-      <form method="GET" action="/admin/edit-user" style="display:inline;">
-        <input type="hidden" name="id" value="${u.id}">
-        <button type="submit">✏️ Modify</button>
-      </form>
-    </li>`;
+        html += `<li>${u.username} (${u.role}) - ${u.address}</li>`;
       });
 
       html += '</ul>';
@@ -133,6 +146,7 @@ router.get('/admin/users', (req, res) => {
     });
   });
 });
+
 
 
 
@@ -186,26 +200,27 @@ router.post('/admin/update-user', isAdmin, (req, res) => {
 router.get('/admin/products', (req, res) => {
   if (!req.session.userId) return res.send('Unauthorized');
 
+  const search = req.query.search || '';
   const db = getDB();
+
   db.get('SELECT role FROM users WHERE id = ?', [req.session.userId], (err, user) => {
     if (err || !user || user.role !== 'admin') {
       db.close();
       return res.send('Access denied');
     }
 
-    db.all('SELECT * FROM products', [], (err, products) => {
+    const sql = search
+      ? 'SELECT * FROM products WHERE LOWER(name) LIKE LOWER(?) ORDER BY stock * 1.0 / volume ASC'
+      : 'SELECT * FROM products ORDER BY stock * 1.0 / volume ASC';
+
+    const params = search ? [`%${search}%`] : [];
+
+    db.all(sql, params, (err, products) => {
       db.close();
       if (err) return res.send('Error loading products');
 
-      // Sort by stock-to-volume ratio (ascending)
-      products.sort((a, b) => {
-        const ratioA = a.volume > 0 ? a.stock / a.volume : 0;
-        const ratioB = b.volume > 0 ? b.stock / b.volume : 0;
-        return ratioA - ratioB;
-      });
-
       let html = `
-        <html lang="">
+        <html>
         <head>
           <title>Admin Product Management</title>
           <script src="/script.js" defer></script>
@@ -219,13 +234,6 @@ router.get('/admin/products', (req, res) => {
               box-shadow: 2px 2px 5px rgba(0,0,0,0.1);
               background: #fdfdfd;
             }
-            .card form { margin-bottom: 6px; }
-            input, textarea {
-              width: 100%;
-              margin-bottom: 6px;
-              padding: 4px;
-              box-sizing: border-box;
-            }
             .bar-container {
               width: 100%;
               background-color: #eee;
@@ -238,21 +246,22 @@ router.get('/admin/products', (req, res) => {
               height: 100%;
               transition: width 0.3s ease;
             }
-            img {
-              display: block;
-              margin: 0 auto 8px;
-              border-radius: 4px;
-            }
           </style>
         </head>
         <body>
           <h1>Manage Products</h1>
           <a href="/admin">← Back</a>
+
+          <form method="GET" action="/admin/products" style="margin-bottom: 1em;">
+            <input type="text" name="search" placeholder="Search products..." value="${search}">
+            <button type="submit">Search</button>
+          </form>
+
           <div class="grid">
       `;
 
       products.forEach(p => {
-        const ratio = (p.volume > 0) ? p.stock / p.volume : 0;
+        const ratio = p.volume > 0 ? p.stock / p.volume : 0;
         const percent = Math.max(0, Math.min(100, Math.floor(ratio * 100)));
         const red = Math.min(255, Math.floor(255 * (1 - ratio)));
         const green = Math.min(255, Math.floor(255 * ratio));
@@ -263,27 +272,21 @@ router.get('/admin/products', (req, res) => {
             <div class="bar-container">
               <div class="bar-fill" style="width: ${percent}%; background-color: ${color};"></div>
             </div>
-
             <p><strong>Image:</strong><br>
-              ${p.image
-          ? `<img src="${p.image}" width="100">`
-          : `<img src="/uploads/placeholder.png" width="100">`}
+              ${p.image ? `<img src="${p.image}" width="100">` : `<img src="/uploads/placeholder.png" width="100">`}
             </p>
-
             <form method="POST" action="/admin/update-product" enctype="multipart/form-data">
               <input type="hidden" name="id" value="${p.id}">
               <label>Name:<input type="text" name="name" value="${p.name}" required></label>
               <label>Description:<textarea name="description" rows="2">${p.description || ''}</textarea></label>
+              <label>Category:<input type="text" name="category" value="${p.category || ''}"></label>
               <label>Volume:<input type="number" name="volume" value="${p.volume || 0}" min="0"></label>
               <label>Price:<input type="number" name="price" value="${p.price}" min="0" step="0.01"></label>
               <label>Stock:<input type="number" name="stock" value="${p.stock || 0}" min="0"></label>
-              <label>Category:<input type="text" name="category" value="${p.category || ''}"></label>
+              <label>Sold:<input type="number" name="sold" value="${p.sold || 0}" min="0"></label>
               <label>Image:<input type="file" name="image"></label>
               <button type="submit">Save Changes</button>
-
-
             </form>
-
             <form method="POST" action="/admin/delete-product">
               <input type="hidden" name="id" value="${p.id}">
               <button type="submit" style="color:red;">❌ Delete</button>
@@ -292,16 +295,17 @@ router.get('/admin/products', (req, res) => {
         `;
       });
 
-      // Add new product card
+      // create product form remains unchanged...
       html += `
         <form method="POST" action="/admin/create-product" enctype="multipart/form-data" class="card">
           <h3>Create New Product</h3>
           <label>Name:<input type="text" name="name" required></label>
           <label>Description:<textarea name="description" rows="2"></textarea></label>
+          <label>Category:<input type="text" name="category"></label>
           <label>Volume:<input type="number" name="volume" value="0" min="0"></label>
           <label>Price:<input type="number" name="price" value="0" min="0" step="0.01"></label>
           <label>Stock:<input type="number" name="stock" value="0" min="0"></label>
-          <label>Category:<input type="text" name="category" value=" "></label>
+          <label>Sold:<input type="number" name="sold" value="0" min="0"></label>
           <label>Image:<input type="file" name="image"></label>
           <button type="submit" style="margin-top:8px;">➕ Create</button>
         </form>
@@ -316,36 +320,77 @@ router.get('/admin/products', (req, res) => {
 
 
 
+
 router.get('/admin/orders', (req, res) => {
   if (!req.session.userId) return res.send('Unauthorized');
+
+  const search = req.query.search || '';
   const db = getDB();
+
   db.get('SELECT role FROM users WHERE id = ?', [req.session.userId], (err, user) => {
     if (err || !user || user.role !== 'admin') {
       db.close();
       return res.send('Access denied');
     }
 
-    db.all(`
-      SELECT orders.id AS order_id, users.username, products.id AS product_id,
-             products.name AS product_name, order_items.quantity, orders.created_at
-      FROM orders
-      JOIN users ON orders.user_id = users.id
-      JOIN order_items ON orders.id = order_items.order_id
-      JOIN products ON order_items.product_id = products.id
-      ORDER BY orders.created_at DESC
-    `, [], (err, orders) => {
+    const sql = search
+      ? `
+        SELECT orders.id AS order_id, users.username, products.id AS product_id,
+               products.name AS product_name, order_items.quantity,
+               orders.created_at, orders.address
+        FROM orders
+        JOIN users ON orders.user_id = users.id
+        JOIN order_items ON orders.id = order_items.order_id
+        JOIN products ON order_items.product_id = products.id
+        WHERE orders.id LIKE ?
+        ORDER BY orders.created_at DESC
+      `
+      : `
+        SELECT orders.id AS order_id, users.username, products.id AS product_id,
+               products.name AS product_name, order_items.quantity,
+               orders.created_at, orders.address
+        FROM orders
+        JOIN users ON orders.user_id = users.id
+        JOIN order_items ON orders.id = order_items.order_id
+        JOIN products ON order_items.product_id = products.id
+        ORDER BY orders.created_at DESC
+      `;
+
+    const params = search ? [`%${search}%`] : [];
+
+    db.all(sql, params, (err, orders) => {
       db.close();
       if (err) return res.send('Error loading orders');
-      let html = `<h1>Manage Orders</h1>
-                         <script src="/script.js" defer></script>
-                         <a href="/admin">← Back</a><ul>`;
+
+      let html = `
+        <h1>Manage Orders</h1>
+        <script src="/script.js" defer></script>
+        <a href="/admin">← Back</a>
+
+        <form method="GET" action="/admin/orders" style="margin-bottom: 1em;">
+          <input type="text" name="search" placeholder="Search order number..." value="${search}">
+          <button type="submit">Search</button>
+        </form>
+
+        <ul>
+      `;
+
       let currentOrder = null;
       orders.forEach(row => {
         if (currentOrder !== row.order_id) {
           if (currentOrder !== null) html += '</ul>';
-          html += `<li><strong>Order #${row.order_id}</strong> by ${row.username} at ${row.created_at}<ul>`;
+          html += `
+            <li>
+              <strong>Order #${row.order_id}</strong> by ${row.username} at ${row.created_at}
+              <br><strong>Address:</strong> ${row.address || 'Not provided'}
+              <form method="POST" action="/admin/delete-order" style="display:inline; margin-top: 4px;">
+                <input type="hidden" name="order_id" value="${row.order_id}">
+                <button type="submit" style="color:red;">❌ Delete Order</button>
+              </form>
+              <ul>`;
           currentOrder = row.order_id;
         }
+
         html += `
           <li>${row.product_name}
             <form method="POST" action="/admin/update-order-item" style="display:inline-flex; gap:4px;">
@@ -359,8 +404,10 @@ router.get('/admin/orders', (req, res) => {
               <input type="hidden" name="product_id" value="${row.product_id}">
               <button type="submit">❌</button>
             </form>
-          </li>`;
+          </li>
+        `;
       });
+
       html += '</ul></ul>';
       res.send(html);
     });
@@ -368,36 +415,20 @@ router.get('/admin/orders', (req, res) => {
 });
 
 
+
 router.post('/admin/update-product', upload.single('image'), (req, res) => {
-  const { id, name, description, price, volume, stock } = req.body;
+  const { id, name, description, price, volume, stock, category, sold } = req.body;
   const imagePath = req.file ? '/uploads/' + req.file.filename : null;
 
   const db = getDB();
   const query = imagePath
-    ? 'UPDATE products SET name = ?, description = ?, price = ?, volume = ?, stock = ?, image = ? WHERE id = ?'
-    : 'UPDATE products SET name = ?, description = ?, price = ?, volume = ?, stock = ? WHERE id = ?';
+    ? 'UPDATE products SET name = ?, description = ?, price = ?, volume = ?, stock = ?, sold = ?, category = ?, image = ? WHERE id = ?'
+    : 'UPDATE products SET name = ?, description = ?, price = ?, volume = ?, stock = ?, sold = ?, category = ? WHERE id = ?';
+
   const params = imagePath
-    ? [name, description, price, volume, stock, imagePath, id]
-    : [name, description, price, volume, stock, id];
+    ? [name, description, price, volume, stock, sold, category, imagePath, id]
+    : [name, description, price, volume, stock, sold, category, id];
 
-  db.run(query, params, err => {
-    db.close();
-    if (err) return res.send('Error updating product: ' + err.message);
-    res.redirect('/admin/products');
-  });
-});
-
-router.post('/admin/update-product', upload.single('image'), (req, res) => {
-  const { id, name, description, price, volume, stock, category } = req.body;
-  const imagePath = req.file ? '/uploads/' + req.file.filename : null;
-
-  const db = getDB();
-  const query = imagePath
-    ? 'UPDATE products SET name = ?, description = ?, price = ?, volume = ?, stock = ?, category = ?, image = ? WHERE id = ?'
-    : 'UPDATE products SET name = ?, description = ?, price = ?, volume = ?, stock = ?, category = ? WHERE id = ?';
-  const params = imagePath
-    ? [name, description, price, volume, stock, category, imagePath, id]
-    : [name, description, price, volume, stock, category, id];
 
   db.run(query, params, err => {
     db.close();
@@ -408,13 +439,13 @@ router.post('/admin/update-product', upload.single('image'), (req, res) => {
 
 
 router.post('/admin/create-product', upload.single('image'), (req, res) => {
-  const { name, description, volume, price, stock } = req.body;
+  const { name, description, volume, price, stock, sold, category } = req.body;
   const imagePath = req.file ? '/uploads/' + req.file.filename : null;
 
   const db = getDB();
   db.run(
-    'INSERT INTO products (name, description, volume, price, stock, image) VALUES (?, ?, ?, ?, ?, ?)',
-    [name, description, volume, price, stock, imagePath],
+    'INSERT INTO products (name, description, volume, price, stock, sold, category, image) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+    [name, description, volume, price, stock, sold, category, imagePath],
     (err) => {
       db.close();
       if (err) return res.send('Error creating product: ' + err.message);
@@ -422,6 +453,7 @@ router.post('/admin/create-product', upload.single('image'), (req, res) => {
     }
   );
 });
+
 
 router.post('/admin/delete-product', (req, res) => {
   const { id } = req.body;
@@ -438,6 +470,25 @@ router.post('/admin/delete-product', (req, res) => {
 });
 
 
+router.post('/admin/delete-order', (req, res) => {
+  const { order_id } = req.body;
+  const db = getDB();
+
+  db.serialize(() => {
+    db.run('DELETE FROM order_items WHERE order_id = ?', [order_id], (err) => {
+      if (err) {
+        db.close();
+        return res.send('Failed to delete order items.');
+      }
+
+      db.run('DELETE FROM orders WHERE id = ?', [order_id], (err2) => {
+        db.close();
+        if (err2) return res.send('Failed to delete order.');
+        res.redirect('/admin/orders');
+      });
+    });
+  });
+});
 
 
 
