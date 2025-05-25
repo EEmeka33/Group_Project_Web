@@ -7,6 +7,7 @@ db.serialize(() => {
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     username TEXT UNIQUE,
     password TEXT,
+    address TEXT,
     role TEXT DEFAULT 'user'
   )`);
 
@@ -16,13 +17,17 @@ db.serialize(() => {
     description TEXT,
     price REAL,
     image TEXT,
-    category TEXT
+    category TEXT DEFAULT 'Uncategorized',
+    stock INTEGER DEFAULT 0,
+    sold INTEGER DEFAULT 0,
+    volume INTEGER DEFAULT 0
   )`);
 
   db.run(`CREATE TABLE IF NOT EXISTS orders (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     user_id INTEGER,
     total REAL,
+    address TEXT,
     created_at TEXT DEFAULT CURRENT_TIMESTAMP
   )`);
 
