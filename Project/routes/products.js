@@ -13,7 +13,7 @@ router.get('/products', (req, res) => {
   db.all('SELECT DISTINCT category FROM products', [], (err, allCategories) => {
     if (err) return res.send('Failed to load categories');
 
-    let sql = 'SELECT * FROM products WHERE 1=1';
+    let sql = 'SELECT * FROM products ';
     const params = [];
 
     if (search) {

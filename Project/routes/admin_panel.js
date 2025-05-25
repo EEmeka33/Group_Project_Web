@@ -220,7 +220,7 @@ router.get('/admin/products', (req, res) => {
       if (err) return res.send('Error loading products');
 
       let html = `
-        <html>
+        <html lang="">
         <head>
           <title>Admin Product Management</title>
           <script src="/script.js" defer></script>
