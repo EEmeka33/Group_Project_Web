@@ -35,13 +35,23 @@ router.get('/admin', (req, res) => {
     db.close();
     if (err || !user || user.role !== 'admin') return res.send('Access denied');
     res.send(`
-      <h1>Admin Dashboard</h1>
-      <script src="/script.js" defer></script>
-      <ul>
-        <li><a href="/admin/users">Manage Users</a></li>
-        <li><a href="/admin/products">Manage Products</a></li>
-        <li><a href="/admin/orders">Manage Orders</a></li>
-      </ul>
+      <!DOCTYPE html>
+      <html lang="en">
+      <head>
+        <title>Admin Dashboard</title>
+        <script src="/script.js" defer></script>
+        <link rel="stylesheet" href="/style.css">
+      </head>
+      <body>
+      <main>
+        <ul>
+          <li><a href="/admin/users">Manage Users</a></li>
+          <li><a href="/admin/products">Manage Products</a></li>
+          <li><a href="/admin/orders">Manage Orders</a></li>
+        </ul>
+      </main>
+      </body>
+      </html>
     `);
   });
 });
@@ -125,23 +135,33 @@ router.get('/admin/users', (req, res) => {
       if (err) return res.send('Error loading users');
 
       let html = `
-        <h1>Manage Users</h1>
-        <script src="/script.js" defer></script>
-        <a href="/admin">← Back</a>
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+          <title>Manage Users</title>
+          <script src="/script.js" defer></script>
+          <link rel="stylesheet" href="/style.css">
+        </head>
+        <body>
+        <main>
+          <a href="/admin">← Back</a>
 
-        <form method="GET" action="/admin/users" style="margin-bottom: 1em;">
-          <input type="text" name="search" placeholder="Search users..." value="${search}">
-          <button type="submit">Search</button>
-        </form>
+          <form method="GET" action="/admin/users" style="margin-bottom: 1em;">
+            <input type="text" name="search" placeholder="Search users..." value="${search}">
+            <button type="submit">Search</button>
+          </form>
 
-        <ul>
+          <ul>
       `;
 
       users.forEach(u => {
         html += `<li>${u.username} (${u.role}) - ${u.address}</li>`;
       });
 
-      html += '</ul>';
+      html += `</ul>
+              </main>
+             </body>
+           </html>`;
       res.send(html);
     });
   });
@@ -158,21 +178,32 @@ router.get('/admin/edit-user', isAdmin, (req, res) => {
     if (err || !user) return res.send('User not found.');
 
     res.send(`
-      <h1>Edit User</h1>
-      <script src="/script.js" defer></script>
-      <a href="/admin/users">← Back</a>
-      <form method="POST" action="/admin/update-user">
-        <input type="hidden" name="id" value="${user.id}">
-        <label>Username:<input type="text" name="username" value="${user.username}" required></label><br>
-        <label>Address:<input type="text" name="address" value="${user.address || ''}"></label><br>
-        <label>Role:
-          <select name="role">
-            <option value="user" ${user.role === 'user' ? 'selected' : ''}>User</option>
-            <option value="admin" ${user.role === 'admin' ? 'selected' : ''}>Admin</option>
-          </select>
-        </label><br>
-        <button type="submit">Update</button>
-      </form>
+      <!DOCTYPE html>
+      <html lang="en">
+      <head>
+        <title>Edit User</title>
+        <script src="/script.js" defer></script>
+        <link rel="stylesheet" href="/style.css">
+      </head>
+      <body>
+      <main>
+        <script src="/script.js" defer></script>
+        <a href="/admin/users">← Back</a>
+        <form method="POST" action="/admin/update-user">
+          <input type="hidden" name="id" value="${user.id}">
+          <label>Username:<input type="text" name="username" value="${user.username}" required></label><br>
+          <label>Address:<input type="text" name="address" value="${user.address || ''}"></label><br>
+          <label>Role:
+            <select name="role">
+              <option value="user" ${user.role === 'user' ? 'selected' : ''}>User</option>
+              <option value="admin" ${user.role === 'admin' ? 'selected' : ''}>Admin</option>
+            </select>
+          </label><br>
+          <button type="submit">Update</button>
+        </form>
+      </main>
+      </body>
+      </html>
     `);
   });
 });
@@ -220,11 +251,24 @@ router.get('/admin/products', (req, res) => {
       if (err) return res.send('Error loading products');
 
       let html = `
-        <html lang="">
+        <!DOCTYPE html>
+        <html lang="en">
         <head>
           <title>Admin Product Management</title>
           <script src="/script.js" defer></script>
           <style>
+            html, body {
+              height: 100%;
+              margin: 0;
+              display: flex;
+              flex-direction: column;
+            }
+
+            main {
+              flex: 1;
+              padding: 20px;
+            }
+
             .grid { display: flex; flex-wrap: wrap; gap: 20px; }
             .card {
               border: 1px solid #ccc;
@@ -249,6 +293,7 @@ router.get('/admin/products', (req, res) => {
           </style>
         </head>
         <body>
+        <main>
           <h1>Manage Products</h1>
           <a href="/admin">← Back</a>
 
@@ -311,7 +356,7 @@ router.get('/admin/products', (req, res) => {
         </form>
       `;
 
-      html += '</div></body></html>';
+      html += '</div></main></body></html>';
       res.send(html);
     });
   });
@@ -363,16 +408,21 @@ router.get('/admin/orders', (req, res) => {
       if (err) return res.send('Error loading orders');
 
       let html = `
-        <h1>Manage Orders</h1>
-        <script src="/script.js" defer></script>
-        <a href="/admin">← Back</a>
-
-        <form method="GET" action="/admin/orders" style="margin-bottom: 1em;">
-          <input type="text" name="search" placeholder="Search order number..." value="${search}">
-          <button type="submit">Search</button>
-        </form>
-
-        <ul>
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+          <title>Manage Orders</title>
+          <script src="/script.js" defer></script>
+          <link rel="stylesheet" href="/style.css">
+        </head>
+        <body>
+        <main>
+            <a href="/admin">← Back</a>
+            <form method="GET" action="/admin/orders" style="margin-bottom: 1em;">
+              <input type="text" name="search" placeholder="Search order number..." value="${search}">
+              <button type="submit">Search</button>
+            </form>
+            <ul>
       `;
 
       let currentOrder = null;
@@ -382,11 +432,11 @@ router.get('/admin/orders', (req, res) => {
           html += `
             <li>
               <strong>Order #${row.order_id}</strong> by ${row.username} at ${row.created_at}
-              <br><strong>Address:</strong> ${row.address || 'Not provided'}
               <form method="POST" action="/admin/delete-order" style="display:inline; margin-top: 4px;">
                 <input type="hidden" name="order_id" value="${row.order_id}">
                 <button type="submit" style="color:red;">❌ Delete Order</button>
               </form>
+              <br><strong>Address:</strong> ${row.address || 'Not provided'}
               <ul>`;
           currentOrder = row.order_id;
         }
@@ -408,7 +458,7 @@ router.get('/admin/orders', (req, res) => {
         `;
       });
 
-      html += '</ul></ul>';
+      html += '</ul></ul></main></body></html>';
       res.send(html);
     });
   });

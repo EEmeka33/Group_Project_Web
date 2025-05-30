@@ -16,14 +16,38 @@ router.get('/cart', (req, res) => {
     db.all('SELECT * FROM orders WHERE user_id = ?', [req.session.userId], (err, orders) => {
       if (err || !orders || orders.length === 0) {
         db.close();
-        return res.send('<h1>Your cart is empty.</h1><script src="/script.js" defer></script>');
+        return res.send(`
+          <!DOCTYPE html>
+          <html lang="en">
+            <head>
+              <meta charset="UTF-8">
+              <title>Your Cart</title>
+              <link rel="stylesheet" href="/style.css">
+              <script src="/script.js" defer></script>
+            </head>
+            <body>
+              <main>
+                <h1>Your Cart</h1>
+                <p>No items in cart.</p>
+              </main>
+            </body>
+          </html>
+        `);
       }
 
       let html = `
-        <header>
-          <h1>Your Cart </h1>
-          <script src="/script.js" defer></script>
-        </header>`;
+        <!DOCTYPE html>
+        <html lang="en">
+          <head>
+            <meta charset="UTF-8">
+            <title>Your Cart</title>
+            <link rel="stylesheet" href="/style.css">
+            <script src="/script.js" defer></script>
+          </head>
+          <body>
+            <main>
+              <h1>Your Cart</h1>
+      `;
 
       let pending = orders.find(o => Number(o.created_at) === 0);
 
@@ -31,7 +55,7 @@ router.get('/cart', (req, res) => {
         db.all(`
           SELECT products.id, products.name, products.price, order_items.quantity
           FROM order_items
-          JOIN products ON order_items.product_id = products.id
+                 JOIN products ON order_items.product_id = products.id
           WHERE order_items.order_id = ?
         `, [orderId], (err, items) => {
           if (err || !items || items.length === 0) {
@@ -58,16 +82,18 @@ router.get('/cart', (req, res) => {
           });
           html += '</ul>';
           totalPrice += 25;
+
           if (title === 'Your Cart') {
             html += `
-              <p>  Tax + Shipping : $25 </p>
+              <p>Tax + Shipping: $25</p>
               <p style="font-weight: bold;">Total: $${totalPrice.toFixed(2)}</p>
               <form method="POST" action="/clear-cart">
                 <button type="submit">Clear Cart</button>
               </form>
               <form method="POST" action="/checkout">
                 <button type="submit">Place Order</button>
-              </form>`;
+              </form>
+            `;
           }
 
           cb();
@@ -80,20 +106,25 @@ router.get('/cart', (req, res) => {
         tasks.push(cb => renderOrderItems(pending.id, 'Your Cart', cb));
       }
 
-      // Sequentially execute async item rendering
       let i = 0;
       const next = () => {
         if (i < tasks.length) {
           tasks[i++](next);
         } else {
           db.close();
+          html += `
+            </main>
+          </body>
+        </html>`;
           res.send(html);
         }
       };
+
       next();
     });
   });
 });
+
 
 router.get('/orders', (req, res) => {
   if (!req.session.userId) return res.redirect('/login');
@@ -104,14 +135,33 @@ router.get('/orders', (req, res) => {
     db.all('SELECT * FROM orders WHERE user_id = ?', [req.session.userId], (err, orders) => {
       if (err || !orders || orders.length === 0) {
         db.close();
-        return res.send('<h1>Your cart is empty.</h1><script src="/script.js" defer></script>');
+        return res.send(`
+          <!DOCTYPE html>
+          <html lang="en">
+            <head>
+              <meta charset="UTF-8">
+              <title>Your Orders</title>
+              <link rel="stylesheet" href="/style.css">
+              <script src="/script.js" defer></script>
+            </head>
+            <body>
+              <main>
+                <h1>Your Orders</h1>
+                <p>No items in cart.</p>
+              </main>
+            </body>
+          </html>
+        `);
       }
 
       let html = `
         <header>
           <h1>Orders</h1>
           <script src="/script.js" defer></script>
-        </header>`;
+          <link rel="stylesheet" href="/style.css">
+        </header>
+        <body>
+          <main>`;
 
       let completeOrders = orders.filter(o => Number(o.created_at) !== 0);
 
@@ -157,6 +207,9 @@ router.get('/orders', (req, res) => {
                 <button type="submit">Place Order</button>
               </form>`;
           }
+          html +=`
+            </main>
+          </body>`
 
           cb();
         });

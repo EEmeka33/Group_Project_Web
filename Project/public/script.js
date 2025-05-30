@@ -82,3 +82,64 @@ document.addEventListener('DOMContentLoaded', () => {
   header.appendChild(rightNav);
   document.body.insertAdjacentElement('afterbegin', header);
 });
+
+
+document.addEventListener('DOMContentLoaded', () => {
+  // Footer HTML content
+  const footerHTML = `
+    <footer class="footer">
+    <link rel="stylesheet" href="/footer.css">
+      <div class="footer-container">
+        <div class="footer-column">
+          <h3>About Us</h3>
+          <ul>
+            <li><a href="#">Our Story</a></li>
+            <li><a href="#">Team</a></li>
+            <li><a href="#">Careers</a></li>
+            <li><a href="#">Contact Us</a></li>
+          </ul>
+        </div>
+        <div class="footer-column">
+          <h3>Services</h3>
+          <ul>
+            <li><a href="#">Shop</a></li>
+            <li><a href="#">Track Orders</a></li>
+            <li><a href="#">Affiliate Program</a></li>
+            <li><a href="#">Customer Support</a></li>
+          </ul>
+        </div>
+        <div class="footer-column">
+          <h3>Legal</h3>
+          <ul>
+            <li><a href="#">Privacy Policy</a></li>
+            <li><a href="#">Terms & Conditions</a></li>
+            <li><a href="#">Refund Policy</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span>My E-Commerce Site | English | USD</span>
+      </div>
+      <a href="#" class="back-to-top">Back to top</a>
+    </footer>
+  `;
+
+  // Insert the footer at the bottom of the page
+  document.body.insertAdjacentHTML('beforeend', footerHTML);
+
+  // Smooth scroll for "Back to Top" button
+  const backToTopButton = document.querySelector('.back-to-top');
+  if (backToTopButton) {
+    backToTopButton.addEventListener('click', (e) => {
+      e.preventDefault();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  }
+});
+
+
+
+
+
+
+
