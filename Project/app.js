@@ -21,6 +21,7 @@ const productRoutes = require('./routes/products');
 const adminRoutes = require('./routes/admin_panel');
 const accountRoutes = require('./routes/account');
 const paymentRoutes = require('./routes/payment');
+const featredRoutes = require('./routes/featured');
 const path = require("path");
 
 app.use('/', authRoutes);
@@ -29,6 +30,7 @@ app.use('/', productRoutes);
 app.use('/', adminRoutes);
 app.use('/', accountRoutes);
 app.use('/', paymentRoutes);
+app.use('/', featredRoutes);
 app.use('/uploads', express.static('uploads'));
 
 

@@ -35,7 +35,9 @@ router.get('/products', (req, res) => {
       let html = `
         <h1>Products</h1>
         <script src="/script.js" defer></script>
+        <script src="/featured_script.js" defer></script>
         <link rel="stylesheet" href="/style.css">
+        <div id="featured-products" class="grid" style="margin-top: 2em;"></div>
         <main>
             <form method="GET" action="/products" style="margin-bottom:1em;">
               <input type="text" name="search" placeholder="Search..." value="${search || ''}">
