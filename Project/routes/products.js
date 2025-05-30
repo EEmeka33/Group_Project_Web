@@ -35,24 +35,27 @@ router.get('/products', (req, res) => {
       let html = `
         <h1>Products</h1>
         <script src="/script.js" defer></script>
+        <script src="/featured_script.js" defer></script>
+        <link rel="stylesheet" href="/style.css">
+        <div id="featured-products" class="grid" style="margin-top: 2em;"></div>
+        <main>
+            <form method="GET" action="/products" style="margin-bottom:1em;">
+              <input type="text" name="search" placeholder="Search..." value="${search || ''}">
+              <input type="hidden" name="category" value="${category || ''}">
+              <button type="submit">Search</button>
+            </form>
 
-        <form method="GET" action="/products" style="margin-bottom:1em;">
-          <input type="text" name="search" placeholder="Search..." value="${search || ''}">
-          <input type="hidden" name="category" value="${category || ''}">
-          <button type="submit">Search</button>
-        </form>
+            <div style="margin-bottom: 1em;">
+              <strong>Filter by Category:</strong>
+              <a href="/products" style="margin-right: 10px; ${!category ? 'font-weight:bold;' : ''}">All</a>
+              ${categories.map(cat => `
+                <a href="/products?category=${encodeURIComponent(cat)}" style="margin-right: 10px; ${cat === category ? 'font-weight:bold;' : ''}">
+                  ${cat}
+                </a>
+              `).join('')}
+            </div>
 
-        <div style="margin-bottom: 1em;">
-          <strong>Filter by Category:</strong>
-          <a href="/products" style="margin-right: 10px; ${!category ? 'font-weight:bold;' : ''}">All</a>
-          ${categories.map(cat => `
-            <a href="/products?category=${encodeURIComponent(cat)}" style="margin-right: 10px; ${cat === category ? 'font-weight:bold;' : ''}">
-              ${cat}
-            </a>
-          `).join('')}
-        </div>
-
-        <div class="grid" style="display:flex; flex-wrap:wrap; gap:20px;">
+            <div class="grid" style="display:flex; flex-wrap:wrap; gap:25px;">
       `;
 
       products.forEach(p => {
@@ -73,7 +76,9 @@ router.get('/products', (req, res) => {
         `;
       });
 
-      html += '</div>';
+      html += `
+        </div>
+      </main>`;
       res.send(html);
     });
   });

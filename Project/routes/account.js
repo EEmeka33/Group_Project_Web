@@ -19,13 +19,23 @@ router.get('/your-account', (req, res) => {
     if (err || !user) return res.send('User not found.');
 
     const html = `
-      <h1>Your Account</h1>
-      <script src="/script.js" defer></script>
-      <form method="POST" action="/your-account">
-        <label>Username: <input type="text" name="username" value="${user.username}" required></label><br><br>
-        <label>Address: <input type="text" name="address" value="${user.address || ''}" required></label><br><br>
-        <button type="submit">Update Info</button>
-      </form>
+      <!DOCTYPE html>
+      <html lang="en">
+      <head>
+        <title>Your Account</title>
+        <script src="/script.js" defer></script>
+        <link rel="stylesheet" href="/style.css">
+      </head>
+      <body>
+      <main>
+        <form method="POST" action="/your-account">
+          <label>Username: <input type="text" name="username" value="${user.username}" required></label><br><br>
+          <label>Address: <input type="text" name="address" value="${user.address || ''}" required></label><br><br>
+          <button type="submit">Update Info</button>
+        </form>
+      </main>
+      <body>
+      </html>
     `;
     res.send(html);
   });
