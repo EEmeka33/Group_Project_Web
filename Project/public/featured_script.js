@@ -13,7 +13,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     data.forEach(p => {
       const productHTML = `
-        <link rel="stylesheet" href="/style.css">
         <div class="featured-card">
           <img src="${p.image || '/uploads/placeholder.png'}" width="150">
           <h4>${p.name}</h4>
@@ -30,7 +29,9 @@ document.addEventListener('DOMContentLoaded', async () => {
       row.insertAdjacentHTML('beforeend', productHTML);
     });
 
-    document.body.insertBefore(container, document.querySelector('script'));
+    const target = document.getElementById('featured-products');
+    if (target) target.appendChild(container);
+
   } catch (err) {
     console.error('Failed to load featured products:', err);
   }

@@ -10,7 +10,14 @@ main {
   padding: 20px;
 }
 
-.grid { display: flex; flex-wrap: wrap; gap: 20px; }
+.grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  justify-content: center; /* This centers the items horizontally */
+}
+
+
 .card {
   font-size: 14px;
   border: 1px solid #ccc;
@@ -32,62 +39,152 @@ main {
   height: 100%;
   transition: width 0.3s ease;
 }
-.featured-products {
+
+#featured-products {
+  flex: none;
+  align-self: stretch;
+  width: 100%;
   margin: 2em 0;
+}
+
+.featured-products {
+  margin: 2em auto;
   padding: 1em;
   background: #f9f9f9;
+  text-align: center;
+  max-width: 1200px;
 }
 
 .featured-row {
   display: flex;
+  flex-wrap: wrap; /* Allow wrapping */
+  justify-content: center;
   gap: 20px;
-  flex-wrap: wrap;
 }
 
+/* Responsive featured cards */
 .featured-card {
-  border: 1px solid #ccc;
-  padding: 10px;
-  width: 200px;
-  text-align: center;
-  background: white;
-  border-radius: 8px;
-  box-shadow: 1px 1px 6px rgba(0, 0, 0, 0.1);
+  flex: 1 1 200px;
+  max-width: 240px;
+  min-width: 180px;
+  box-sizing: border-box;
+}
+
+/* Optional: Adjust font sizes on very small screens */
+@media (max-width: 600px) {
+  .featured-card {
+    flex: 1 1 100%;
+    max-width: 90%;
+  }
+
+  .featured-card h4 {
+    font-size: 1rem;
+  }
+
+  .featured-card p {
+    font-size: 0.9rem;
+  }
 }
 
 
 
-.signin-container {
-  width: 350px;
+
+
+
+
+
+
+
+
+
+.login-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   padding: 20px;
-  margin-top: 40px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.page-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Optional for login only, remove from homepage layout */
+.login-container.login-box {
+  max-width: 350px;
+}
+
+/* Optional for login only, remove from homepage layout */
+.login-container.register-box {
+  max-width: 350px;
 }
 
 
-.signin-box {
+.login-container {
+  width: 100%;
+  max-width: 350px;
+  padding: 20px;
+}
+
+.page-container {
+  width: 100%;
+  padding: 20px;
+}
+
+.login-box {
   border: 1px solid #ddd;
   padding: 20px;
-  border-radius: 5px;
-  background-color: #fdfdfd;
+  border-radius: 8px;
+  background-color: #fff;
 }
 
-.signin-box h1 {
-  font-size: 24px;
+.register-box {
+  border: 1px solid #ddd;
+  padding: 20px;
+  border-radius: 8px;
+  background-color: #fff;
+}
+
+
+
+.login-logo {
+  display: block;
+  margin: 0 auto 20px;
+  max-width: 100px;
+}
+
+
+.login-box h1 {
+  font-size: 28px;
+  margin-bottom: 20px;
+}
+
+.register-box h1 {
+  font-size: 28px;
   margin-bottom: 20px;
 }
 
 label {
+  font-weight: bold;
   display: block;
   margin-bottom: 5px;
-  font-weight: bold;
+  font-size: 13px;
 }
 
 input[type="text"],
 input[type="password"] {
   width: 100%;
-  padding: 8px;
-  margin-bottom: 15px;
-  border: 1px solid #ccc;
-  border-radius: 3px;
+  padding: 10px;
+  margin-bottom: 16px;
+  border: 1px solid #a6a6a6;
+  border-radius: 4px;
+  box-sizing: border-box;
 }
 
 button[type="submit"] {
@@ -95,39 +192,106 @@ button[type="submit"] {
   padding: 10px;
   background-color: #f0c14b;
   border: 1px solid #a88734;
-  border-radius: 3px;
+  border-radius: 4px;
   font-weight: bold;
   cursor: pointer;
 }
 
 button[type="submit"]:hover {
-  background-color: #e2b33c;
+  background-color: #ddb347;
 }
 
-.help-link {
+.login-help {
   margin-top: 10px;
+  font-size: 12px;
   text-align: right;
-  font-size: 14px;
 }
 
-.divider {
+.login-divider {
   text-align: center;
   margin: 20px 0;
-  font-size: 14px;
-  color: #555;
+  font-size: 12px;
+  color: #666;
 }
 
-.create-account-button {
+.create-account-btn {
   display: block;
   text-align: center;
   padding: 10px;
   border: 1px solid #ccc;
-  border-radius: 3px;
+  border-radius: 4px;
   text-decoration: none;
   background-color: #e7e9ec;
   font-weight: bold;
+  color: #111;
 }
 
-.create-account-button:hover {
+.create-account-btn:hover {
   background-color: #d5d7da;
 }
+
+.page-container > h2,
+.page-container > p {
+  text-align: center;
+}
+
+.page-container {
+  text-align: center;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .nav-links {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  main {
+    padding: 1.5rem;
+  }
+
+  input, textarea {
+    font-size: 1rem;
+  }
+
+  button {
+    width: auto;
+  }
+}
+
+@media (max-width: 480px) {
+  header h1 {
+    font-size: 1.5rem;
+  }
+
+  .nav-links a {
+    font-size: 1rem;
+  }
+
+  main {
+    padding: 1rem;
+  }
+
+  form {
+    gap: 0.75rem;
+  }
+
+  button {
+    width: 100%;
+  }
+}
+
+/* Narrow admin orders action buttons (exclude search) */
+form[action="/admin/update-order-item"] button,
+form[action="/admin/delete-order-item"] button,
+form[action="/admin/delete-order"] button {
+  width: auto !important;
+  display: inline-block;
+  padding: 5px 10px;
+  margin: 2px;
+  font-size: 14px;
+  white-space: nowrap;
+
+}
+
+

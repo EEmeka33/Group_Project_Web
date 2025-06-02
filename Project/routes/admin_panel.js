@@ -398,9 +398,9 @@ router.get('/admin/orders', (req, res) => {
           html += `
             <li>
               <strong>Order #${row.order_id}</strong> by ${row.username} at ${row.created_at}
-              <form method="POST" action="/admin/delete-order" style="display:inline; margin-top: 4px;">
+              <form method="POST" action="/admin/delete-order" style="display:inline;">
                 <input type="hidden" name="order_id" value="${row.order_id}">
-                <button type="submit" style="color:red;">❌ Delete Order</button>
+                <button type="submit" style="color:red;" style="width:auto; display:inline-block; padding:4px 8px;">❌ Delete Order</button>
               </form>
               <br><strong>Address:</strong> ${row.address || 'Not provided'}
               <ul>`;
@@ -413,12 +413,12 @@ router.get('/admin/orders', (req, res) => {
               <input type="hidden" name="order_id" value="${row.order_id}">
               <input type="hidden" name="product_id" value="${row.product_id}">
               <input type="number" name="quantity" value="${row.quantity}" min="1" style="width:30px;">
-              <button type="submit">↺</button>
+              <button type="submit" style="width:auto; display:inline-block; padding:4px 8px;">↺</button>
             </form>
             <form method="POST" action="/admin/delete-order-item" style="display:inline;">
               <input type="hidden" name="order_id" value="${row.order_id}">
               <input type="hidden" name="product_id" value="${row.product_id}">
-              <button type="submit">❌</button>
+              <button type="submit" style="width:auto; display:inline-block; padding:4px 8px;">❌</button>
             </form>
           </li>
         `;
