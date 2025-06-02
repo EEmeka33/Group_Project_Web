@@ -2,23 +2,34 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Login</title>
-  <link rel="stylesheet" href="/style.css">
+  <title>Sign-In</title>
+  <link rel="stylesheet" href="/styles.css">
 </head>
 <body>
-<main>
-  <h1>Login</h1>
-  <form method="POST" action="/login">
-    <label>
-      <input type="text" name="username" placeholder="Username" required>
-    </label><br>
-    <label>
-      <input type="password" name="password" placeholder="Password" required>
-    </label><br>
-    <button type="submit">Login</button>
-  </form>
-  <p>Don't have an account? <a href="/register">Register here</a></p>
-  <script src="/script.js" defer></script>
-</main>
+<div class="signin-container">
+  <a href="/"><img src="/logo.png" alt="Logo" class="logo"></a>
+
+  <div class="signin-box">
+    <h1>Sign-In</h1>
+    <form method="POST" action="/login">
+      <label for="username">Username</label>
+      <input type="text" name="username" id="username" required>
+
+      <label for="password">Password</label>
+      <input type="password" name="password" id="password" required>
+
+      <button type="submit">Sign-In</button>
+    </form>
+    <p class="help-link"><a href="#">Need help?</a></p>
+  </div>
+
+  <div class="divider">
+    <span>New to this site?</span>
+  </div>
+
+  <a href="/register" class="create-account-button">Create your account</a>
+</div>
+
+<script src="/script.js" defer></script>
 </body>
 </html>
