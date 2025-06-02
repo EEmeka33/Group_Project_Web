@@ -1,45 +1,34 @@
 document.addEventListener('DOMContentLoaded', () => {
   const header = document.createElement('header');
-  header.style.backgroundColor = '#333';
-  header.style.color = 'white';
-  header.style.padding = '2em';
-  header.style.display = 'flex';
-  header.style.justifyContent = 'space-between';
-  header.style.alignItems = 'center';
-  header.style.position = 'relative';  // new
-
+  header.className = 'custom-header';
 
   const leftNav = document.createElement('nav');
   leftNav.innerHTML = `
-    <a href="/products" style="color:white; margin:0 10px; text-decoration:none;">Products</a>
+    <a href="/products" class="nav-link">Products</a>
+    <link rel="stylesheet" href="/header.css">
   `;
 
   const title = document.createElement('div');
-  title.innerHTML = '<a href="/" style="color:white; margin:0 10px; text-decoration:none;"><h1 style="margin: 0;">🛍️ My E-Commerce Site</h1></a>';
-  title.style.position = 'absolute';
-  title.style.left = '50%';
-  title.style.transform = 'translateX(-50%)';
-  title.style.textAlign = 'center';
-
-
+  title.innerHTML = '<a href="/" class="nav-link"><h1 style="margin: 0;">🛍️ My E-Commerce Site</h1></a>';
+  title.className = 'header-title';
 
   const rightNav = document.createElement('nav');
-  rightNav.style.textAlign = 'right';
+  rightNav.className = 'right-nav';
 
   fetch('/session-info')
     .then(res => res.json())
     .then(data => {
       if (data.loggedIn) {
         rightNav.innerHTML = `
-          <div style="position: relative; display: inline-block;">
-            <button id="userButton" style="background: none; border: none; color: white; cursor: pointer; font-weight: bold;">
+          <div class="user-dropdown">
+            <button id="userButton" class="user-button">
               👤 ${data.username} ⌄
             </button>
-            <div id="userMenu" style="display: none; position: absolute; right: 0; background-color: white; color: black; min-width: 150px; box-shadow: 0 8px 16px rgba(0,0,0,0.2); z-index: 1;">
-              <a href="/your-account" style="display:block; padding: 10px; text-decoration: none; color: black;">Your account</a>
-              <a href="/cart" style="display:block; padding: 10px; text-decoration: none; color: black;">🛒 Cart</a>
-              <a href="/orders" style="display:block; padding: 10px; text-decoration: none; color: black;">🛒 Orders</a>
-              <a href="/logout" style="display:block; padding: 10px; text-decoration: none; color: black;">🚪 Logout</a>
+            <div id="userMenu" class="user-menu">
+              <a href="/your-account" class="user-menu-link">Your account</a>
+              <a href="/cart" class="user-menu-link">🛒 Cart</a>
+              <a href="/orders" class="user-menu-link">🛒 Orders</a>
+              <a href="/logout" class="user-menu-link">🚪 Logout</a>
             </div>
           </div>
         `;
@@ -58,16 +47,15 @@ document.addEventListener('DOMContentLoaded', () => {
           });
         }, 0);
 
-        // Add admin link if username is admin
         if (data.username === 'admin') {
           leftNav.innerHTML += `
-            <a href="/admin" style="color:white; margin:0 10px; text-decoration:none;">Admin</a>
+            <a href="/admin" class="nav-link">Admin</a>
           `;
         }
       } else {
         rightNav.innerHTML = `
-          <a href="/login" style="color:white; margin:0 10px; text-decoration:none;">Login</a>
-          <a href="/register" style="color:white; margin:0 10px; text-decoration:none;">Register</a>
+          <a href="/login" class="nav-link">Login</a>
+          <a href="/register" class="nav-link">Register</a>
         `;
       }
     })
@@ -78,10 +66,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
   header.appendChild(leftNav);
   header.appendChild(title);
-  rightNav.innerHTML += `<a href="/cart" ">🛒 Cart</a>`;
+  rightNav.innerHTML += `<a href="/cart" class="nav-link">🛒 Cart</a>`;
   header.appendChild(rightNav);
   document.body.insertAdjacentElement('afterbegin', header);
 });
+
+
 
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -89,6 +79,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const footerHTML = `
     <footer class="footer">
     <link rel="stylesheet" href="/footer.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
       <div class="footer-container">
         <div class="footer-column">
           <h3>About Us</h3>
@@ -120,26 +111,10 @@ document.addEventListener('DOMContentLoaded', () => {
       <div class="footer-bottom">
         <span>My E-Commerce Site | English | USD</span>
       </div>
-      <a href="#" class="back-to-top">Back to top</a>
     </footer>
   `;
 
   // Insert the footer at the bottom of the page
   document.body.insertAdjacentHTML('beforeend', footerHTML);
 
-  // Smooth scroll for "Back to Top" button
-  const backToTopButton = document.querySelector('.back-to-top');
-  if (backToTopButton) {
-    backToTopButton.addEventListener('click', (e) => {
-      e.preventDefault();
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    });
-  }
 });
-
-
-
-
-
-
-

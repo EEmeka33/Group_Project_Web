@@ -256,41 +256,7 @@ router.get('/admin/products', (req, res) => {
         <head>
           <title>Admin Product Management</title>
           <script src="/script.js" defer></script>
-          <style>
-            html, body {
-              height: 100%;
-              margin: 0;
-              display: flex;
-              flex-direction: column;
-            }
-
-            main {
-              flex: 1;
-              padding: 20px;
-            }
-
-            .grid { display: flex; flex-wrap: wrap; gap: 20px; }
-            .card {
-              border: 1px solid #ccc;
-              padding: 10px;
-              width: 250px;
-              border-radius: 8px;
-              box-shadow: 2px 2px 5px rgba(0,0,0,0.1);
-              background: #fdfdfd;
-            }
-            .bar-container {
-              width: 100%;
-              background-color: #eee;
-              border-radius: 4px;
-              overflow: hidden;
-              margin-bottom: 8px;
-              height: 12px;
-            }
-            .bar-fill {
-              height: 100%;
-              transition: width 0.3s ease;
-            }
-          </style>
+          <link rel="stylesheet" href="/style.css">
         </head>
         <body>
         <main>

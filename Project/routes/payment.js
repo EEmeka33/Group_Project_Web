@@ -49,6 +49,7 @@ router.post('/checkout', (req, res) => {
         let html = `
           <h1>Checkout</h1>
           <script src="/script.js" defer></script>
+          <link rel="stylesheet" href="/style.css">
           <form method="POST" action="/pay">
             <ul>
               ${items.map(i => `<li>${i.name} × ${i.quantity} — $${(i.price * i.quantity).toFixed(2)}</li>`).join('')}
@@ -174,6 +175,7 @@ router.post('/pay', (req, res) => {
                     <p>Your order and address have been recorded.</p>
                     <a href="/products">Continue Shopping</a>
                     <script src="/script.js" defer></script>
+                    <link rel="stylesheet" href="/style.css">
                   `);
                 });
               })

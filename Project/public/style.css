@@ -9,3 +9,47 @@ main {
   flex: 1;
   padding: 20px;
 }
+
+.grid { display: flex; flex-wrap: wrap; gap: 20px; }
+.card {
+  font-size: 14px;
+  border: 1px solid #ccc;
+  padding: 10px;
+  width: 250px;
+  border-radius: 8px;
+  box-shadow: 2px 2px 5px rgba(0,0,0,0.1);
+  background: #fdfdfd;
+}
+.bar-container {
+  width: 100%;
+  background-color: #eee;
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 8px;
+  height: 12px;
+}
+.bar-fill {
+  height: 100%;
+  transition: width 0.3s ease;
+}
+.featured-products {
+  margin: 2em 0;
+  padding: 1em;
+  background: #f9f9f9;
+}
+
+.featured-row {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.featured-card {
+  border: 1px solid #ccc;
+  padding: 10px;
+  width: 200px;
+  text-align: center;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 1px 1px 6px rgba(0, 0, 0, 0.1);
+}
