@@ -9,9 +9,8 @@
 <main class="login-wrapper">
   <div class="login-container">
 <div class="signin-container">
-
-  <div class="signin-box">
-    <h1>Sign-In</h1>
+  <div class="register-box">
+    <h1>Login</h1>
     <form method="POST" action="/login">
       <label for="username">Username</label>
       <input type="text" name="username" id="username" required>
@@ -21,14 +20,8 @@
 
       <button type="submit">Sign-In</button>
     </form>
-    <p class="help-link"><a href="#">Need help?</a></p>
+    <p>Need to <a href="/register" class="create-account-button">create an account</a>?</p>
   </div>
-
-  <div class="divider">
-    <span>New to this site?</span>
-  </div>
-
-  <a href="/register" class="create-account-button">Create your account</a>
 </div>
 
 <script src="/script.js" defer></script>
