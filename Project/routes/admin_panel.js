@@ -155,7 +155,15 @@ router.get('/admin/users', (req, res) => {
       `;
 
       users.forEach(u => {
-        html += `<li>${u.username} (${u.role}) - ${u.address}</li>`;
+        html += `
+    <li>
+      ${u.username} (${u.role}) - ${u.address}
+      <form method="GET" action="/admin/edit-user" style="display:inline-block; margin-left: 10px;">
+        <input type="hidden" name="id" value="${u.id}">
+        <button type="submit" style="padding: 4px 8px;">✏️ Modify</button>
+      </form>
+    </li>
+  `;
       });
 
       html += `</ul>
@@ -187,18 +195,12 @@ router.get('/admin/edit-user', isAdmin, (req, res) => {
       </head>
       <body>
       <main>
-        <script src="/script.js" defer></script>
         <a href="/admin/users">← Back</a>
         <form method="POST" action="/admin/update-user">
           <input type="hidden" name="id" value="${user.id}">
           <label>Username:<input type="text" name="username" value="${user.username}" required></label><br>
           <label>Address:<input type="text" name="address" value="${user.address || ''}"></label><br>
-          <label>Role:
-            <select name="role">
-              <option value="user" ${user.role === 'user' ? 'selected' : ''}>User</option>
-              <option value="admin" ${user.role === 'admin' ? 'selected' : ''}>Admin</option>
-            </select>
-          </label><br>
+            <br>
           <button type="submit">Update</button>
         </form>
       </main>
