@@ -16,7 +16,9 @@ main {
   flex-wrap: wrap;
   gap: 20px;
   justify-content: center;
+  align-items: stretch;
 }
+
 
 .card {
   display: flex;
@@ -30,6 +32,9 @@ main {
   box-shadow: 2px 2px 5px rgba(0,0,0,0.1);
   background: #fdfdfd;
   box-sizing: border-box;
+  height: 100%;
+  min-height: 540px; /* consistent height */
+  margin-bottom: 0; /* remove space under card */
 }
 
 .bar-container {
@@ -97,8 +102,60 @@ main {
 
 .card img,
 .featured-card img {
+  max-width: 100%;
+  height: auto;
   display: block;
   margin: 0 auto;
+}
+
+.card,
+.featured-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%;
+  box-sizing: border-box;
+  animation: fadeInUp 0.5s ease-in-out both;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+
+.card-header,
+.card-image,
+.card-description,
+.card-footer {
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+.card-image img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  margin: 0 auto;
+}
+
+.card-description {
+  flex-grow: 1;
+  text-align: center;
+  padding: 10px 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-height: 72px; /* limit height for consistent spacing */
+}
+
+.card-footer {
+  text-align: center;
+  margin-bottom: 0;
+  margin-top: 10px;
+}
+
+.card-footer form {
+  margin: 0; /* remove bottom spacing */
+}
+
+.card-footer button {
+  margin-bottom: 0;
 }
 
 .login-wrapper, .page-wrapper {
@@ -271,29 +328,74 @@ main {
   flex-grow: 1;
 }
 
+/* Unified Header & Footer Style */
+.custom-header,
 footer {
-  background-color: #232f3e;
+  background-color: #232f3e; /* dark gray-blue */
   color: white;
-  padding: 20px 0;
-  width: 100%;
+  padding: 1.5em 10%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   position: relative;
-  text-align: center;
-  z-index: 1000;
+  font-family: 'Poppins', sans-serif;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
 }
 
+footer {
+  flex-direction: column;
+  box-shadow: 0 -2px 6px rgba(0, 0, 0, 0.15);
+}
+
+/* Header & Footer Links */
+.custom-header a,
+footer a {
+  color: white;
+  text-decoration: none;
+  margin: 0 10px;
+  font-weight: 500;
+}
+
+.user-dropdown a{
+  color: black;
+
+}
+
+.custom-header a:hover,
+footer a:hover {
+  text-decoration: underline;
+}
+
+/* Header Center Title */
+.header-title {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  text-align: center;
+  font-size: 1.5em;
+  font-weight: bold;
+}
+
+/* Footer Content Structure */
 .footer-container {
   display: flex;
   justify-content: space-between;
-  padding: 0 10%;
+  flex-wrap: wrap;
+  width: 100%;
+  max-width: 1200px;
+  margin: auto;
+  padding: 1em 0;
 }
 
 .footer-column {
-  width: 30%;
+  flex: 1 1 30%;
+  margin: 10px;
 }
 
 .footer-column h3 {
+  font-size: 16px;
   margin-bottom: 10px;
-  font-size: 18px;
+  color: #f0c14b;
 }
 
 .footer-column ul {
@@ -302,7 +404,7 @@ footer {
 }
 
 .footer-column ul li {
-  margin-bottom: 8px;
+  margin-bottom: 6px;
 }
 
 .footer-column ul li a {
@@ -314,37 +416,32 @@ footer {
   text-decoration: underline;
 }
 
-footer .footer-bottom {
+/* Footer Bottom Text */
+.footer-bottom {
   background-color: #131a22;
   padding: 10px;
-  color: white;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  text-align: center;
+  font-size: 13px;
+  color: #ddd;
+  width: 100%;
 }
 
+/* "Back to top" link */
 footer .back-to-top {
   position: absolute;
   right: 20px;
   bottom: 20px;
   font-size: 14px;
-  color: white;
-  text-decoration: none;
+  color: #f0c14b;
 }
 
 footer .back-to-top:hover {
   text-decoration: underline;
 }
 
-.custom-header {
-  background-color: #333;
-  color: white;
-  padding: 2em;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  position: relative;
-}
+
+
+
 
 .nav-link {
   color: white;
@@ -392,4 +489,28 @@ footer .back-to-top:hover {
   padding: 10px;
   text-decoration: none;
   color: black;
+}
+
+
+/* Fade-in animation on load */
+@keyframes fadeInUp {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+
+
+
+/* Hover effect */
+.card:hover,
+.featured-card:hover {
+  transform: translateY(-10px) scale(1.03);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2);
+  z-index: 10;
 }

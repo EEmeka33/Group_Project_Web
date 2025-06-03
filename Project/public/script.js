@@ -77,41 +77,43 @@ document.addEventListener('DOMContentLoaded', () => {
 document.addEventListener('DOMContentLoaded', () => {
   // Footer HTML content
   const footerHTML = `
-    <footer class="footer">
-    <link rel="stylesheet" href="/style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
-      <div class="footer-container">
-        <div class="footer-column">
-          <h3>About Us</h3>
-          <ul>
-            <li><a href="#">Our Story</a></li>
-            <li><a href="#">Team</a></li>
-            <li><a href="#">Careers</a></li>
-            <li><a href="#">Contact Us</a></li>
-          </ul>
-        </div>
-        <div class="footer-column">
-          <h3>Services</h3>
-          <ul>
-            <li><a href="#">Shop</a></li>
-            <li><a href="#">Track Orders</a></li>
-            <li><a href="#">Affiliate Program</a></li>
-            <li><a href="#">Customer Support</a></li>
-          </ul>
-        </div>
-        <div class="footer-column">
-          <h3>Legal</h3>
-          <ul>
-            <li><a href="#">Privacy Policy</a></li>
-            <li><a href="#">Terms & Conditions</a></li>
-            <li><a href="#">Refund Policy</a></li>
-          </ul>
-        </div>
-      </div>
-      <div class="footer-bottom">
-        <span>My E-Commerce Site | English | USD</span>
-      </div>
-    </footer>
+    <footer>
+  <div class="footer-container">
+    <div class="footer-column">
+      <h3>About Us</h3>
+      <ul>
+        <li><a href="#">Our Story</a></li>
+        <li><a href="#">Team</a></li>
+        <li><a href="#">Careers</a></li>
+        <li><a href="#">Contact Us</a></li>
+      </ul>
+    </div>
+
+    <div class="footer-column">
+      <h3>Services</h3>
+      <ul>
+        <li><a href="#">Shop</a></li>
+        <li><a href="#">Track Orders</a></li>
+        <li><a href="#">Affiliate Program</a></li>
+        <li><a href="#">Customer Support</a></li>
+      </ul>
+    </div>
+
+    <div class="footer-column">
+      <h3>Legal</h3>
+      <ul>
+        <li><a href="#">Privacy Policy</a></li>
+        <li><a href="#">Terms & Conditions</a></li>
+        <li><a href="#">Refund Policy</a></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="footer-bottom">
+    My E-Commerce Site | English | USD
+  </div>
+</footer>
+
   `;
 
   // Insert the footer at the bottom of the page

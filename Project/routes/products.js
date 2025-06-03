@@ -41,14 +41,14 @@ router.get('/products', (req, res) => {
       let html = `
       <div class="page-wrapper">
         <main class="page-container">
-        <h1>Products</h1>
+
         <script src="/script.js" defer></script>
         <script src="/featured_script.js" defer></script>
         <link rel="stylesheet" href="/style.css">
 
 
         <div id="featured-products" class="grid" style="margin-top: 2em;"></div>
-
+        <h1>Products</h1>
             <form method="GET" action="/products" style="margin-bottom:1em;">
               <input type="text" name="search" placeholder="Search..." value="${search || ''}">
               <input type="hidden" name="category" value="${category || ''}">
@@ -70,20 +70,29 @@ router.get('/products', (req, res) => {
 
       products.forEach(p => {
         html += `
-          <div class="card" style="width:200px; padding:10px; border:1px solid #ccc;">
-            <h3>${p.name}</h3>
-            <p><strong>Category:</strong> ${p.category || 'Uncategorized'}</p>
-            <img src="${p.image || '/uploads/placeholder.png'}" width="150">
-            <p>${p.description || 'No description'}</p>
-            <p><strong>Price:</strong> $${p.price}</p>
-            <form method="POST" action="/add-to-cart">
-              <input type="hidden" name="id" value="${p.id}">
-              <input type="hidden" name="name" value="${p.name}">
-              <input type="hidden" name="price" value="${p.price}">
-              <button type="submit">Add to Cart</button>
-            </form>
-          </div>
-        `;
+  <div class="card">
+    <div class="card-header">
+      <h3>${p.name}</h3>
+      <p><strong>Category:</strong> ${p.category || 'Uncategorized'}</p>
+    </div>
+    <div class="card-image">
+      <img src="${p.image || '/uploads/placeholder.png'}" width="150">
+    </div>
+    <div class="card-description">
+      <p>${p.description || 'No description'}</p>
+    </div>
+    <div class="card-footer">
+      <p><strong>Price:</strong> $${p.price}</p>
+      <form method="POST" action="/add-to-cart">
+        <input type="hidden" name="id" value="${p.id}">
+        <input type="hidden" name="name" value="${p.name}">
+        <input type="hidden" name="price" value="${p.price}">
+        <button type="submit">Add to Cart</button>
+      </form>
+    </div>
+  </div>
+`;
+
       });
 
       html += `
