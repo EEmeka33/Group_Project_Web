@@ -47,8 +47,10 @@ router.post('/checkout', (req, res) => {
         let total = items.reduce((sum, item) => sum + item.price * item.quantity, 25); // +25 for shipping/tax
 
         let html = `
+          <main>
           <h1>Checkout</h1>
           <script src="/script.js" defer></script>
+          <link rel="stylesheet" href="/style.css">
           <form method="POST" action="/pay">
             <ul>
               ${items.map(i => `<li>${i.name} × ${i.quantity} — $${(i.price * i.quantity).toFixed(2)}</li>`).join('')}
@@ -79,6 +81,7 @@ router.post('/checkout', (req, res) => {
             <label>CVC: <input name="cvc" required></label><br>
             <button type="submit">Pay Now</button>
           </form>
+          </main>
         `;
 
         res.send(html);
@@ -153,7 +156,7 @@ router.post('/pay', (req, res) => {
 
             Promise.all(validateStockTasks)
               .then(() => {
-                if (Math.random() < 0.1) throw 'Mock payment declined.';
+                if (1==2) throw 'Mock payment declined.';
                 const updateTasks = items.map(item => {
                   return new Promise((resolve, reject) => {
                     db.run(
@@ -170,10 +173,13 @@ router.post('/pay', (req, res) => {
                   db.close();
                   if (err) return res.send('Error finalizing order.');
                   res.send(`
+                    <main>
                     <h1>✅ Order Placed</h1>
                     <p>Your order and address have been recorded.</p>
                     <a href="/products">Continue Shopping</a>
+                    </main>
                     <script src="/script.js" defer></script>
+                    <link rel="stylesheet" href="/style.css">
                   `);
                 });
               })

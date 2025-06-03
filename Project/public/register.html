@@ -4,21 +4,27 @@
   <meta charset="UTF-8">
   <title>Register</title>
   <link rel="stylesheet" href="/style.css">
-  <script src="/script.js" defer></script>
 </head>
 <body>
-<main>
+<main class="login-wrapper">
+  <div class="login-container">
+    <div class="signin-container">
+  <div class="register-box">
   <h1>Register</h1>
   <form method="POST" action="/register">
-    <label>
-      <input type="text" name="username" placeholder="Username" required>
-    </label><br>
-    <label>
-      <input type="password" name="password" placeholder="Password" required>
-    </label><br>
+    <label for="username">Username</label>
+    <input type="text" name="username" id="username" required>
+
+    <label for="password">Password</label>
+    <input type="password" name="password" id="password" required>
+    <br>
     <button type="submit">Register</button>
   </form>
   <p>Already have an account? <a href="/login">Login here</a></p>
+  </div>
+    <script src="/script.js" defer></script>
+  </div>
+  </div>
 </main>
 </body>
 </html>

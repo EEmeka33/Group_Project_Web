@@ -155,7 +155,15 @@ router.get('/admin/users', (req, res) => {
       `;
 
       users.forEach(u => {
-        html += `<li>${u.username} (${u.role}) - ${u.address}</li>`;
+        html += `
+    <li>
+      ${u.username} (${u.role}) - ${u.address}
+      <form method="GET" action="/admin/edit-user" style="display:inline-block; margin-left: 10px;">
+        <input type="hidden" name="id" value="${u.id}">
+        <button type="submit" style="padding: 4px 8px;">✏️ Modify</button>
+      </form>
+    </li>
+  `;
       });
 
       html += `</ul>
@@ -187,18 +195,12 @@ router.get('/admin/edit-user', isAdmin, (req, res) => {
       </head>
       <body>
       <main>
-        <script src="/script.js" defer></script>
         <a href="/admin/users">← Back</a>
         <form method="POST" action="/admin/update-user">
           <input type="hidden" name="id" value="${user.id}">
           <label>Username:<input type="text" name="username" value="${user.username}" required></label><br>
           <label>Address:<input type="text" name="address" value="${user.address || ''}"></label><br>
-          <label>Role:
-            <select name="role">
-              <option value="user" ${user.role === 'user' ? 'selected' : ''}>User</option>
-              <option value="admin" ${user.role === 'admin' ? 'selected' : ''}>Admin</option>
-            </select>
-          </label><br>
+            <br>
           <button type="submit">Update</button>
         </form>
       </main>
@@ -256,41 +258,7 @@ router.get('/admin/products', (req, res) => {
         <head>
           <title>Admin Product Management</title>
           <script src="/script.js" defer></script>
-          <style>
-            html, body {
-              height: 100%;
-              margin: 0;
-              display: flex;
-              flex-direction: column;
-            }
-
-            main {
-              flex: 1;
-              padding: 20px;
-            }
-
-            .grid { display: flex; flex-wrap: wrap; gap: 20px; }
-            .card {
-              border: 1px solid #ccc;
-              padding: 10px;
-              width: 250px;
-              border-radius: 8px;
-              box-shadow: 2px 2px 5px rgba(0,0,0,0.1);
-              background: #fdfdfd;
-            }
-            .bar-container {
-              width: 100%;
-              background-color: #eee;
-              border-radius: 4px;
-              overflow: hidden;
-              margin-bottom: 8px;
-              height: 12px;
-            }
-            .bar-fill {
-              height: 100%;
-              transition: width 0.3s ease;
-            }
-          </style>
+          <link rel="stylesheet" href="/style.css">
         </head>
         <body>
         <main>
@@ -432,9 +400,9 @@ router.get('/admin/orders', (req, res) => {
           html += `
             <li>
               <strong>Order #${row.order_id}</strong> by ${row.username} at ${row.created_at}
-              <form method="POST" action="/admin/delete-order" style="display:inline; margin-top: 4px;">
+              <form method="POST" action="/admin/delete-order" style="display:inline;">
                 <input type="hidden" name="order_id" value="${row.order_id}">
-                <button type="submit" style="color:red;">❌ Delete Order</button>
+                <button type="submit" style="color:red;" style="width:auto; display:inline-block; padding:4px 8px;">❌ Delete Order</button>
               </form>
               <br><strong>Address:</strong> ${row.address || 'Not provided'}
               <ul>`;
@@ -447,12 +415,12 @@ router.get('/admin/orders', (req, res) => {
               <input type="hidden" name="order_id" value="${row.order_id}">
               <input type="hidden" name="product_id" value="${row.product_id}">
               <input type="number" name="quantity" value="${row.quantity}" min="1" style="width:30px;">
-              <button type="submit">↺</button>
+              <button type="submit" style="width:auto; display:inline-block; padding:4px 8px;">↺</button>
             </form>
             <form method="POST" action="/admin/delete-order-item" style="display:inline;">
               <input type="hidden" name="order_id" value="${row.order_id}">
               <input type="hidden" name="product_id" value="${row.product_id}">
-              <button type="submit">❌</button>
+              <button type="submit" style="width:auto; display:inline-block; padding:4px 8px;">❌</button>
             </form>
           </li>
         `;
