@@ -151,7 +151,6 @@ router.get('/product/:id', (req, res) => {
         </body>
       </html>
     `;
-
     res.send(html);
   });
 });
