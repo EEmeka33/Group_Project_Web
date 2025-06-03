@@ -5,7 +5,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const leftNav = document.createElement('nav');
   leftNav.innerHTML = `
     <a href="/products" class="nav-link">Products</a>
-    <link rel="stylesheet" href="/header.css">
+    <link rel="stylesheet" href="/style.css">
   `;
 
   const title = document.createElement('div');
@@ -78,7 +78,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // Footer HTML content
   const footerHTML = `
     <footer class="footer">
-    <link rel="stylesheet" href="/footer.css">
+    <link rel="stylesheet" href="/style.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
       <div class="footer-container">
         <div class="footer-column">
