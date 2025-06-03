@@ -89,9 +89,9 @@ document.addEventListener('DOMContentLoaded', () => {
       </ul>
     </div>
 
-    <div class="footer-column">
+    <div class="footer-column" >
       <h3>Services</h3>
-      <ul>
+      <ul >
         <li><a href="#">Shop</a></li>
         <li><a href="#">Track Orders</a></li>
         <li><a href="#">Affiliate Program</a></li>

@@ -398,7 +398,7 @@ footer a:hover {
 /* Footer Content Structure */
 .footer-container {
   display: flex;
-  justify-content: space-between;
+  text-align: center;
   flex-wrap: wrap;
   width: 100%;
   max-width: 1200px;
@@ -409,6 +409,8 @@ footer a:hover {
 .footer-column {
   flex: 1 1 30%;
   margin: 10px;
+  justify-content: center;
+
 }
 
 .footer-column h3 {
