@@ -26,10 +26,12 @@ router.get('/cart', (req, res) => {
               <script src="/script.js" defer></script>
             </head>
             <body>
-              <main>
+            <div class="page-wrapper">
+              <main class="page-container">
                 <h1>Your Cart</h1>
                 <p>No items in cart.</p>
               </main>
+              </div>
             </body>
           </html>
         `);
@@ -45,63 +47,79 @@ router.get('/cart', (req, res) => {
             <script src="/script.js" defer></script>
           </head>
           <body>
-            <main>
-              <h1>Your Cart</h1>
+
+              <main class="page-container">
+                <div class="cart-items">
       `;
 
-      let pending = orders.find(o => Number(o.created_at) === 0);
+      const pending = orders.find(o => Number(o.created_at) === 0);
 
       const renderOrderItems = (orderId, title, cb) => {
         db.all(`
-          SELECT products.id, products.name, products.price, order_items.quantity
+          SELECT products.id, products.name, products.price, products.image, order_items.quantity
           FROM order_items
                  JOIN products ON order_items.product_id = products.id
           WHERE order_items.order_id = ?
         `, [orderId], (err, items) => {
           if (err || !items || items.length === 0) {
-            html += `<h2>${title}</h2><p>No items.</p>`;
+            html += `<h2>${title}</h2><p>No items.</p>
+</div>
+              </main>
+          </body>
+        </html>`;
             return cb();
           }
 
-          html += `<h2>${title}</h2><ul>`;
-          let totalPrice = 0;
-          items.forEach(item => {
-            html += `
-              <li>${item.name} - $${item.price} ×
-              <form method="POST" action="/update-quantity" style="display:inline-flex; align-items:center; gap:4px;">
-                <input type="hidden" name="id" value="${item.id}">
-                <input type="number" name="quantity" value="${item.quantity}" min="1" style="width:30px;">
-                <button type="submit" style="padding:2px 6px;">↺</button>
-              </form>
-              <form method="POST" action="/remove-from-cart" style="display:inline;">
-                <input type="hidden" name="id" value="${item.id}">
-                <button type="submit">Remove</button>
-              </form>
-              </li>`;
-            totalPrice += item.price * item.quantity;
-          });
-          html += '</ul>';
-          totalPrice += 25;
+          html += `<h2>${title}</h2>`;
 
-          if (title === 'Your Cart') {
+          let totalPrice = 0;
+
+          items.forEach(item => {
+            totalPrice += item.price * item.quantity;
             html += `
-              <p>Tax + Shipping: $25</p>
-              <p style="font-weight: bold;">Total: $${totalPrice.toFixed(2)}</p>
+              <div class="cart-card">
+                <div class="cart-image">
+                  <img src="${item.image || '/uploads/placeholder.png'}" alt="${item.name}">
+                </div>
+                <div class="cart-details">
+                  <h3>${item.name}</h3>
+                  <p><strong>Price:</strong> $${item.price}</p>
+                  <p><strong>Quantity:</strong></p>
+                  <form method="POST" action="/update-quantity" class="cart-form-inline" style="display:inline-block;">
+                    <input type="hidden" name="id" value="${item.id}">
+                    <input type="number" name="quantity" value="${item.quantity}" min="1">
+                    <button type="submit">↺</button>
+                  </form>
+                  <form method="POST" action="/remove-from-cart" class="cart-remove-form" style="display:inline-block;">
+                    <input type="hidden" name="id" value="${item.id}">
+                    <button type="submit">Remove</button>
+                  </form>
+                </div>
+              </div>
+            `;
+          });
+
+          const taxed = totalPrice * 0.1;
+          const total = totalPrice + taxed;
+
+          html += `
+            <div class="cart-summary">
+              <p>Tax + Shipping: $${taxed.toFixed(2)}</p>
+              <p><strong>Total:</strong> $${total.toFixed(2)}</p>
               <form method="POST" action="/clear-cart">
                 <button type="submit">Clear Cart</button>
               </form>
               <form method="POST" action="/checkout">
                 <button type="submit">Place Order</button>
               </form>
-            `;
-          }
+            </div>
+          `;
 
           cb();
         });
       };
 
       const tasks = [];
-
       if (pending) {
         tasks.push(cb => renderOrderItems(pending.id, 'Your Cart', cb));
       }
@@ -113,7 +131,8 @@ router.get('/cart', (req, res) => {
         } else {
           db.close();
           html += `
-            </main>
+                </div>
+              </main>
           </body>
         </html>`;
           res.send(html);
@@ -124,6 +143,9 @@ router.get('/cart', (req, res) => {
     });
   });
 });
+
+
+
 
 
 router.get('/orders', (req, res) => {
@@ -371,7 +393,6 @@ router.post('/place-order', (req, res) => {
     );
   });
 });
-
 
 
 

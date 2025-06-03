@@ -110,7 +110,7 @@ document.addEventListener('DOMContentLoaded', () => {
   </div>
 
   <div class="footer-bottom">
-    My E-Commerce Site | English | USD
+    My Pokémon shop | English | USD
   </div>
 </footer>
 

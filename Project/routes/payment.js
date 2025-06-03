@@ -47,6 +47,7 @@ router.post('/checkout', (req, res) => {
         let total = items.reduce((sum, item) => sum + item.price * item.quantity, 25); // +25 for shipping/tax
 
         let html = `
+          <main>
           <h1>Checkout</h1>
           <script src="/script.js" defer></script>
           <link rel="stylesheet" href="/style.css">
@@ -80,6 +81,7 @@ router.post('/checkout', (req, res) => {
             <label>CVC: <input name="cvc" required></label><br>
             <button type="submit">Pay Now</button>
           </form>
+          </main>
         `;
 
         res.send(html);
@@ -171,9 +173,11 @@ router.post('/pay', (req, res) => {
                   db.close();
                   if (err) return res.send('Error finalizing order.');
                   res.send(`
+                    <main>
                     <h1>✅ Order Placed</h1>
                     <p>Your order and address have been recorded.</p>
                     <a href="/products">Continue Shopping</a>
+                    </main>
                     <script src="/script.js" defer></script>
                     <link rel="stylesheet" href="/style.css">
                   `);
