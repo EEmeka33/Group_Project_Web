@@ -19,6 +19,9 @@ main {
 
 
 .card {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
   font-size: 14px;
   border: 1px solid #ccc;
   padding: 10px;
@@ -26,7 +29,9 @@ main {
   border-radius: 8px;
   box-shadow: 2px 2px 5px rgba(0,0,0,0.1);
   background: #fdfdfd;
+  box-sizing: border-box;
 }
+
 .bar-container {
   width: 100%;
   background-color: #eee;
@@ -64,11 +69,15 @@ main {
 
 /* Responsive featured cards */
 .featured-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
   flex: 1 1 200px;
   max-width: 240px;
   min-width: 180px;
   box-sizing: border-box;
 }
+
 
 /* Optional: Adjust font sizes on very small screens */
 @media (max-width: 600px) {
@@ -86,8 +95,17 @@ main {
   }
 }
 
+.card form,
+.featured-card form {
+  margin-top: auto;
+}
 
 
+.card img,
+.featured-card img {
+  display: block;
+  margin: 0 auto;
+}
 
 
 
