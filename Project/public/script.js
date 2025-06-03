@@ -9,7 +9,7 @@ document.addEventListener('DOMContentLoaded', () => {
   `;
 
   const title = document.createElement('div');
-  title.innerHTML = '<a href="/"><img src="../uploads/logo.png" alt="Logo" class="logo" width="125px"></a>';
+  title.innerHTML = '<a href="/"><img src="../uploads/logo.png" alt="Logo" class="logo" style="125px"></a>';
   title.className = 'header-title';
 
   const rightNav = document.createElement('nav');
