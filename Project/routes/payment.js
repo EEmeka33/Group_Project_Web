@@ -156,7 +156,7 @@ router.post('/pay', (req, res) => {
 
             Promise.all(validateStockTasks)
               .then(() => {
-                if (Math.random() < 0.1) throw 'Mock payment declined.';
+                if (1==2) throw 'Mock payment declined.';
                 const updateTasks = items.map(item => {
                   return new Promise((resolve, reject) => {
                     db.run(
